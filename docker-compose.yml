@@ -8,6 +8,11 @@ services:
       - "${BACKEND_PORT}:80"
     networks:
       - default
+    depends_on:
+      db:
+        condition: service_healthy
+    links: 
+        - db
     environment:
       TZ: Asia/Bangkok
       DATABASE_MYSQL_HOST: db
@@ -24,7 +29,7 @@ services:
 
   db:
     container_name: streamysnap_authservice_database
-    image: mariadb:10.8
+    image: mariadb:latest
     restart: always
     networks:
       - default
@@ -35,6 +40,12 @@ services:
       MARIADB_DATABASE: ${DB_NAME}
       MARIADB_USER: ${DB_USERNAME}
       MARIADB_PASSWORD: ${DB_PASSWORD}
+    healthcheck:
+      # test: "/usr/bin/mysql --user=${DB_USERNAME} --password=${DB_PASSWORD} --execute \"SHOW DATABASES;\""
+      test: ["CMD-SHELL", "mysql --user=${DB_USERNAME} --password=${DB_PASSWORD} ${DB_NAME}"]
+      interval: 3s
+      timeout: 1s
+      retries: 5
 
   phpmyadmin:
     container_name: streamysnap_authservice_phpmyadmin
