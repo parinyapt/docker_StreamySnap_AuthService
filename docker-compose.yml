@@ -24,7 +24,7 @@ services:
 
   db:
     container_name: streamysnap_authservice_database
-    image: mariadb:latest
+    image: mariadb:10.8
     restart: always
     networks:
       - default
